@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using DAL.DTO;
+using Core.Models;
 
 namespace DAL {
 	public class UserDAL {

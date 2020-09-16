@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using Core.Models;
 using DAL;
-using DAL.DTO;
 
 namespace BLL {
     public class UserBLL {
