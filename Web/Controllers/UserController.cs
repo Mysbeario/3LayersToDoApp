@@ -4,16 +4,17 @@ using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers {
-	[Route ("api/[controller]")]
+	[Route ("/api/[controller]")]
 	[ApiController]
 	public class UserController : ControllerBase {
 		private UserBLL service;
+
 		public UserController () {
 			this.service = new UserBLL ();
 		}
 
 		[HttpGet]
-		public IEnumerable<User> GetUsers () {
+		public IEnumerable<User> GetAllUsers () {
 			return this.service.GetAllUsers ().ToArray ();
 		}
 	}
