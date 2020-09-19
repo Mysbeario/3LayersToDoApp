@@ -1,48 +1,23 @@
-import React from "react";
-import {
-  AppBar,
-  Button,
-  IconButton,
-  Typography,
-  makeStyles,
-  Theme,
-  createStyles,
-  Toolbar,
-} from "@material-ui/core";
-import { Menu as MenuIcon } from "@material-ui/icons";
+import React, { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Loading from "../components/Loading";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    title: {
-      flexGrow: 1,
-    },
-  })
-);
+const AdminPage = lazy(() => import("./Admin"));
 
 const App = (): JSX.Element => {
-  const classes = useStyles();
   return (
-    <div>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.menuButton}
-            color="inherit"
-            aria-label="menu"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            News
-          </Typography>
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </AppBar>
-    </div>
+    <Suspense fallback={<Loading />}>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/">
+            Go to /admin to enter Administrator Dashboard
+          </Route>
+          <Route path="/admin">
+            <AdminPage />
+          </Route>
+        </Switch>
+      </BrowserRouter>
+    </Suspense>
   );
 };
 

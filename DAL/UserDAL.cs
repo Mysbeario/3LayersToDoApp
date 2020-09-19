@@ -81,7 +81,7 @@ namespace DAL {
 		public static void DeleteUser (int id) {
 			DAL.ConnectDb ();
 
-			string query = "DELETE Users WHERE Id = @UserId";
+			string query = "DELETE FROM Users WHERE Id = @UserId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@UserId", id);

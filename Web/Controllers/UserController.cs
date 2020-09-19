@@ -17,5 +17,20 @@ namespace Web.Controllers {
 		public IEnumerable<User> GetAllUsers () {
 			return this.service.GetAllUsers ().ToArray ();
 		}
+
+		[HttpPost]
+		public void AddUser (User user) {
+			this.service.AddUser (user);
+		}
+
+		[HttpPut]
+		public void UpdateUser (User user) {
+			this.service.UpdateUser (user);
+		}
+
+		[HttpDelete ("{id}")]
+		public void DeleteUser (int id) {
+			this.service.DeleteUser (id);
+		}
 	}
 }

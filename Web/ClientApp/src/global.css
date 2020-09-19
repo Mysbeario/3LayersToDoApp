@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "Roboto";
+  src: url("./assets/fonts/Roboto-Regular.ttf");
+}
+
+body {
+  background-color: #f5f5f5;
+  font-family: "Roboto";
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

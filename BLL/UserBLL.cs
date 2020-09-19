@@ -12,23 +12,12 @@ namespace BLL {
             return UserDAL.GetUserById (id);
         }
 
-        public void AddUser (string name, string email, string password) {
-            User u = new User ();
-            u.Name = name;
-            u.Email = email;
-            u.Password = password;
-
-            UserDAL.AddUser (u);
+        public void AddUser (User user) {
+            UserDAL.AddUser (user);
         }
 
-        public void UpdateUser (int id, string name, string email, string password) {
-            User u = new User ();
-            u.Id = id;
-            u.Name = name;
-            u.Email = email;
-            u.Password = password;
-
-            UserDAL.UpdateUser (u);
+        public void UpdateUser (User user) {
+            UserDAL.UpdateUser (user);
         }
 
         public void DeleteUser (int id) {
