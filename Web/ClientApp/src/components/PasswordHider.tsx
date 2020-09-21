@@ -12,7 +12,7 @@ interface Props {
   value: string;
 }
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       color: "#000!important",

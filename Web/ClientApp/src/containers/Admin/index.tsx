@@ -10,8 +10,9 @@ import {
 import CategoryMenu from "./CategoryMenu";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
 import UserManager from "./UserManager";
+import TaskManager from "./TaskManager";
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     root: {
       display: "grid",
@@ -40,6 +41,9 @@ const Admin = (): JSX.Element => {
             </Route>
             <Route exact path={`${path}/user`}>
               <UserManager />
+            </Route>
+            <Route exact path={`${path}/task`}>
+              <TaskManager />
             </Route>
           </Switch>
         </Grid>
