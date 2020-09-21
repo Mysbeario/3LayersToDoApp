@@ -4,12 +4,13 @@ using System.Data.SQLite;
 using Core.Models;
 
 namespace DAL {
-	public class UserDAL {
+	public static class UserDAL {
+		private static string TableName = "Users";
 		public static List<User> GetAllUsers () {
 			DAL.ConnectDb ();
 
 			List<User> data = new List<User> ();
-			string query = "SELECT * FROM Users";
+			string query = "SELECT * FROM " + TableName;
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 			SQLiteDataReader reader = command.ExecuteReader ();
 
@@ -33,7 +34,7 @@ namespace DAL {
 			DAL.ConnectDb ();
 
 			User u = new User ();
-			string query = "SELECT * FROM Users WHERE Id = @UserId";
+			string query = "SELECT * FROM " + TableName + " WHERE Id = @UserId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@UserID", id);
@@ -53,7 +54,7 @@ namespace DAL {
 		public static void AddUser (User u) {
 			DAL.ConnectDb ();
 
-			string query = "INSERT INTO Users (Name, Email, Password) " +
+			string query = "INSERT INTO " + TableName + " (Name, Email, Password) " +
 				"VALUES (@UserName, @UserEmail, @UserPassword)";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
@@ -66,7 +67,7 @@ namespace DAL {
 		public static void UpdateUser (User u) {
 			DAL.ConnectDb ();
 
-			string query = "UPDATE Users SET " +
+			string query = "UPDATE " + TableName + " SET " +
 				"Name = @UserName, Email = @UserEmail, Password = @UserPassword " +
 				"WHERE Id = @UserId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
@@ -81,7 +82,7 @@ namespace DAL {
 		public static void DeleteUser (int id) {
 			DAL.ConnectDb ();
 
-			string query = "DELETE FROM Users WHERE Id = @UserId";
+			string query = "DELETE FROM " + TableName + " WHERE Id = @UserId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@UserId", id);
