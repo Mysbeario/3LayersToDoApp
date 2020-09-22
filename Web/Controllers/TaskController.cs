@@ -17,5 +17,20 @@ namespace Web.Controllers {
 		public IEnumerable<Task> GetAllTasks () {
 			return this.service.GetAllTasks ().ToArray ();
 		}
+
+		[HttpPost]
+		public void AddNewTask (Task task) {
+			this.service.AddTask (task);
+		}
+
+		[HttpPut]
+		public void UpdateTask (Task task) {
+			this.service.UpdateTask (task);
+		}
+
+		[HttpDelete ("{id}")]
+		public void DeleteTask (int id) {
+			this.service.DeleteTask (id);
+		}
 	}
 }

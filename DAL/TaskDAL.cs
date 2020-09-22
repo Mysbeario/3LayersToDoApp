@@ -22,7 +22,8 @@ namespace DAL {
 					t.Title = reader.GetString (2);
 					t.Description = reader.GetString (3);
 					t.Status = (TaskStatus) reader.GetInt32 (4);
-					t.CreatedOn = DateTime.Parse (reader.GetString (5));
+					t.StartDate = DateTime.Parse (reader.GetString (5));
+					t.EndDate = DateTime.Parse (reader.GetString (6));
 					data.Add (t);
 				}
 
@@ -49,7 +50,8 @@ namespace DAL {
 				t.Title = reader["Title"].ToString ();
 				t.Description = reader["Description"].ToString ();
 				t.Status = (TaskStatus) Int32.Parse (reader["Status"].ToString ());
-				t.CreatedOn = DateTime.Parse (reader["CreatedOn"].ToString ());
+				t.StartDate = DateTime.Parse (reader["StartDate"].ToString ());
+				t.EndDate = DateTime.Parse (reader["EndDate"].ToString ());
 			}
 
 			return t;
@@ -58,15 +60,16 @@ namespace DAL {
 		public static void AddTask (Task t) {
 			DAL.ConnectDb ();
 
-			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, CreatedOn) " +
-				"VALUES (@OwnerId, @Title, @Description, @Status, @CreatedOn)";
+			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, StartDate, EndDate) " +
+				"VALUES (@OwnerId, @Title, @Description, @Status, @StartDate, @EndDate)";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@OwnerId", t.Owner.Id);
 			command.Parameters.AddWithValue ("@Title", t.Title);
 			command.Parameters.AddWithValue ("@Description", t.Description);
 			command.Parameters.AddWithValue ("@Status", t.Status);
-			command.Parameters.AddWithValue ("@CreatedOn", t.CreatedOn.ToString ());
+			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
+			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
 			command.ExecuteNonQuery ();
 		}
 
@@ -74,7 +77,7 @@ namespace DAL {
 			DAL.ConnectDb ();
 
 			string query = "UPDATE " + TableName + " SET " +
-				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, CreatedOn = @CreatedOn " +
+				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, StartDate = @StartDate, EndDate = @EndDate " +
 				"WHERE Id = @TaskId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
@@ -83,7 +86,8 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@Title", t.Title);
 			command.Parameters.AddWithValue ("@Description", t.Description);
 			command.Parameters.AddWithValue ("@Status", t.Status);
-			command.Parameters.AddWithValue ("@CreatedOn", t.CreatedOn.ToString ());
+			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
+			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
 			command.ExecuteNonQuery ();
 		}
 

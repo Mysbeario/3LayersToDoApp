@@ -12,7 +12,8 @@ import convertDateToString from "../../../utilities/convertDateToString";
 interface Props {
   title: string;
   description: string;
-  createdOn: string;
+  startDate: string;
+  endDate: string;
   owner: string;
 }
 
@@ -32,9 +33,9 @@ const TaskDetails = (props: Props): JSX.Element => {
     <Card className={classes.card}>
       <CardHeader
         title={props.title}
-        subheader={`${props.owner} created at ${convertDateToString(
-          new Date(props.createdOn)
-        )}`}
+        subheader={`By ${props.owner} | Start: ${convertDateToString(
+          new Date(props.startDate)
+        )} | End: ${convertDateToString(new Date(props.endDate))}`}
       />
       <CardContent>
         <Typography variant="body1" color="textPrimary" component="p">
