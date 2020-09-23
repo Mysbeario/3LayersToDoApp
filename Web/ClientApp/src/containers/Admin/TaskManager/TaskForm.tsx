@@ -22,8 +22,10 @@ import { TaskData, UserInfo } from ".";
 interface Props {
   open: boolean;
   onClose: () => void;
-  rowData?: TaskData;
+  editData?: Partial<TaskData>;
   onChange: (newData: Omit<TaskData, "id">, oldData?: TaskData) => void;
+  forAdmin?: boolean;
+  action: "create" | "update";
 }
 
 const useStyles = makeStyles(() =>
@@ -35,14 +37,20 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
+const TaskForm = ({
+  editData,
+  onChange,
+  forAdmin = true,
+  action,
+  ...props
+}: Props): JSX.Element => {
   const classes = useStyles();
   const [submitError, setSubmitError] = useState(false);
   const [users, setUser] = useState<UserInfo[]>([]);
   const [title, setTitle] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [owner, setOwner] = useState<UserInfo>();
-  const [status, setStatus] = useState<number>();
+  const [status, setStatus] = useState<number>(0);
   const [startDate, setStartDate] = useState<string>();
   const [endDate, setEndDate] = useState<string>();
 
@@ -54,16 +62,17 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    setTitle(rowData?.title);
-    setDescription(rowData?.description);
-    setOwner(rowData?.owner);
-    setEndDate(rowData?.endDate);
-    setStartDate(rowData?.startDate);
-    setStatus(rowData?.status);
-  }, [rowData]);
+    setTitle(editData?.title);
+    setDescription(editData?.description);
+    setOwner(editData?.owner);
+    setEndDate(editData?.endDate);
+    setStartDate(editData?.startDate);
+    setStatus(editData?.status || 0);
+  }, [editData]);
 
   const add = async (): Promise<void> => {
-    if (!title || !description || !status || !owner || !startDate || !endDate) {
+    console.table([title, description, status, owner, startDate, endDate]);
+    if (!title || !description || !owner || !startDate || !endDate) {
       setSubmitError(true);
     } else {
       const data = {
@@ -76,12 +85,12 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
       };
       const url = "/api/task";
 
-      if (!rowData) {
+      if (action === "create") {
         Axios.post(url, data);
-        onChange(data as TaskData);
+        onChange(data);
       } else {
-        Axios.put(url, { ...data, id: rowData?.id });
-        onChange(data as TaskData, rowData);
+        Axios.put(url, { ...data, id: editData?.id });
+        onChange(data, editData as TaskData);
       }
       props.onClose();
     }
@@ -94,14 +103,14 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
         <FormGroup className={classes.form}>
           <FormControl>
             <TextField
-              value={rowData?.title}
+              defaultValue={editData?.title}
               onChange={(e) => setTitle(e.target.value)}
               label="Title"
             />
           </FormControl>
           <FormControl>
             <TextField
-              value={rowData?.description}
+              defaultValue={editData?.description}
               label="Description"
               multiline
               rows={4}
@@ -109,33 +118,36 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
               onChange={(e) => setDescription(e.target.value)}
             />
           </FormControl>
-          <FormControl>
-            <Autocomplete
-              value={rowData?.owner}
-              options={users}
-              getOptionLabel={(option: UserInfo) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Owner" variant="outlined" />
-              )}
-              onChange={(_, value: UserInfo | null) =>
-                setOwner(value || { id: "", name: "" })
-              }
-            />
-          </FormControl>
-          <FormControl>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={rowData?.status}
-              onChange={(e) => setStatus(e.target.value as number)}
-            >
-              <MenuItem value={0}>To Do</MenuItem>
-              <MenuItem value={1}>Doing</MenuItem>
-              <MenuItem value={2}>Done</MenuItem>
-            </Select>
-          </FormControl>
+          {forAdmin && (
+            <>
+              <FormControl>
+                <Autocomplete
+                  defaultValue={editData?.owner}
+                  options={users}
+                  getOptionLabel={(option: UserInfo) => option.name}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Owner" variant="outlined" />
+                  )}
+                  onChange={(_, value: UserInfo | null) =>
+                    setOwner(value || { id: 0, name: "" })
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  defaultValue={editData?.status || 0}
+                  onChange={(e) => setStatus(e.target.value as number)}
+                >
+                  <MenuItem value={0}>Doing</MenuItem>
+                  <MenuItem value={1}>Done</MenuItem>
+                </Select>
+              </FormControl>
+            </>
+          )}
           <FormControl>
             <TextField
-              value={rowData?.startDate}
+              defaultValue={editData?.startDate}
               label="Start Date"
               type="datetime-local"
               InputLabelProps={{
@@ -148,7 +160,7 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
           </FormControl>
           <FormControl>
             <TextField
-              value={rowData?.endDate}
+              defaultValue={editData?.endDate}
               label="End Date"
               type="datetime-local"
               InputLabelProps={{
@@ -182,4 +194,4 @@ const AddTaskForm = ({ rowData, onChange, ...props }: Props): JSX.Element => {
   );
 };
 
-export default AddTaskForm;
+export default TaskForm;

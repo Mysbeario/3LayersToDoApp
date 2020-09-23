@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import {
   AppBar,
   Typography,
@@ -9,8 +9,6 @@ import {
 } from "@material-ui/core";
 import CategoryMenu from "./CategoryMenu";
 import { Route, Switch, useRouteMatch } from "react-router-dom";
-import UserManager from "./UserManager";
-import TaskManager from "./TaskManager";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -20,6 +18,9 @@ const useStyles = makeStyles(() =>
     },
   })
 );
+
+const UserManager = lazy(() => import("./UserManager"));
+const TaskManager = lazy(() => import("./TaskManager"));
 
 const Admin = (): JSX.Element => {
   const classes = useStyles();

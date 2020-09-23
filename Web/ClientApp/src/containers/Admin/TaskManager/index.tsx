@@ -4,11 +4,11 @@ import MaterialTable from "material-table";
 import TableIcons from "../../../components/TableIcons";
 import convertDateToString from "../../../utilities/convertDateToString";
 import TaskDetails from "./TaskDetails";
-import AddTaskForm from "./AddTaskForm";
+import TaskForm from "./TaskForm";
 import { Add as AddIcon, Edit as EditIcon } from "@material-ui/icons";
 
 interface UserInfo {
-  id: string;
+  id: number;
   name: string;
 }
 
@@ -28,6 +28,7 @@ const TaskManager = (): JSX.Element => {
   const [data, setData] = useState<TaskData[]>([]);
   const [openForm, setOpenForm] = useState(false);
   const [rowData, setRowData] = useState<TaskData>();
+  const [formAction, setFormAction] = useState<"create" | "update">("create");
 
   const onRowChange = (
     newData: Omit<TaskData, "id">,
@@ -103,6 +104,7 @@ const TaskManager = (): JSX.Element => {
             isFreeAction: true,
             onClick: () => {
               setRowData(undefined);
+              setFormAction("create");
               setOpenForm(true);
             },
           },
@@ -111,16 +113,18 @@ const TaskManager = (): JSX.Element => {
             tooltip: "Edit Task",
             onClick: (_, oldData) => {
               setRowData(oldData as TaskData);
+              setFormAction("update");
               setOpenForm(true);
             },
           },
         ]}
       />
-      <AddTaskForm
+      <TaskForm
         open={openForm}
-        rowData={rowData}
+        editData={rowData}
         onChange={onRowChange}
         onClose={(): void => setOpenForm(false)}
+        action={formAction}
       />
     </>
   );

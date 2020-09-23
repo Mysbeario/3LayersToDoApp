@@ -2,7 +2,6 @@ using System;
 
 namespace Core.Models {
 	public enum TaskStatus {
-		ToDo,
 		Doing,
 		Done,
 	}

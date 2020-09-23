@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Loading from "../components/Loading";
 
 const AdminPage = lazy(() => import("./Admin"));
+const UserPage = lazy(() => import("./User"));
 
 const App = (): JSX.Element => {
   return (
@@ -10,7 +11,7 @@ const App = (): JSX.Element => {
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
-            Go to /admin to enter Administrator Dashboard
+            <UserPage />
           </Route>
           <Route path="/admin">
             <AdminPage />
