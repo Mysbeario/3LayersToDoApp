@@ -70,7 +70,7 @@ const TaskManager = (): JSX.Element => {
           {
             title: "Status",
             field: "status",
-            lookup: { 0: "To Do", 1: "Doing", 2: "Done" },
+            lookup: { 0: "Doing", 1: "Done" },
           },
           {
             title: "Owner",

@@ -3,12 +3,14 @@ import Axios from "axios";
 import MaterialTable from "material-table";
 import PasswordHider from "../../../components/PasswordHider";
 import TableIcons from "../../../components/TableIcons";
+import { MenuItem, Select } from "@material-ui/core";
 
 interface UserData {
-  id: string;
+  id: number;
   name: string;
   email: string;
   password: string;
+  role: number;
 }
 
 const url = "/api/user";
@@ -70,6 +72,22 @@ const UserManager = (): JSX.Element => {
         },
         { title: "Name", field: "name" },
         { title: "Email", field: "email" },
+        {
+          title: "Role",
+          field: "role",
+          initialEditValue: 0,
+          lookup: { 0: "Staff", 1: "Manager" },
+          editComponent: (props) => (
+            <Select
+              style={{ fontSize: "0.875rem" }}
+              defaultValue={0}
+              onChange={(e) => props.onChange(e.target.value)}
+            >
+              <MenuItem value={0}>Staff</MenuItem>
+              <MenuItem value={1}>Manager</MenuItem>
+            </Select>
+          ),
+        },
         {
           title: "Password",
           field: "password",

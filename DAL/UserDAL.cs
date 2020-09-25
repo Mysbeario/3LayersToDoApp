@@ -21,6 +21,7 @@ namespace DAL {
 					u.Name = reader.GetString (1);
 					u.Email = reader.GetString (2);
 					u.Password = reader.GetString (3);
+					u.Role = reader.GetInt32 (4);
 					data.Add (u);
 				}
 
@@ -46,6 +47,7 @@ namespace DAL {
 				u.Name = reader["Name"].ToString ();
 				u.Email = reader["Email"].ToString ();
 				u.Password = reader["Password"].ToString ();
+				u.Role = Int16.Parse (reader["Role"].ToString ());
 			}
 
 			return u;
@@ -54,13 +56,14 @@ namespace DAL {
 		public static void AddUser (User u) {
 			DAL.ConnectDb ();
 
-			string query = "INSERT INTO " + TableName + " (Name, Email, Password) " +
-				"VALUES (@UserName, @UserEmail, @UserPassword)";
+			string query = "INSERT INTO " + TableName + " (Name, Email, Password, Role) " +
+				"VALUES (@UserName, @UserEmail, @UserPassword, @UserRole)";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@UserName", u.Name);
 			command.Parameters.AddWithValue ("@UserEmail", u.Email);
 			command.Parameters.AddWithValue ("@UserPassword", u.Password);
+			command.Parameters.AddWithValue ("@UserRole", u.Role);
 			command.ExecuteNonQuery ();
 		}
 
@@ -68,7 +71,7 @@ namespace DAL {
 			DAL.ConnectDb ();
 
 			string query = "UPDATE " + TableName + " SET " +
-				"Name = @UserName, Email = @UserEmail, Password = @UserPassword " +
+				"Name = @UserName, Email = @UserEmail, Password = @UserPassword, Role = @UserRole " +
 				"WHERE Id = @UserId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
@@ -76,6 +79,7 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@UserName", u.Name);
 			command.Parameters.AddWithValue ("@UserEmail", u.Email);
 			command.Parameters.AddWithValue ("@UserPassword", u.Password);
+			command.Parameters.AddWithValue ("@UserRole", u.Role);
 			command.ExecuteNonQuery ();
 		}
 
