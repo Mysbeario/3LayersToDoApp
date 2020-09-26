@@ -31,15 +31,12 @@ const UserPage = (): JSX.Element => {
   const [data, setData] = useState<TaskData[]>([]);
   const [formAction, setFormAction] = useState<"create" | "update">("create");
 
-  const onRowChange = (
-    newData: Omit<TaskData, "id">,
-    oldData?: TaskData
-  ): void => {
+  const onRowChange = (newData: TaskData, oldData?: TaskData): void => {
     if (oldData) {
       const updatedData = [...data];
       updatedData[data.indexOf(oldData)] = { ...newData, id: oldData.id };
       setData(updatedData);
-    } else setData([{ ...newData, id: data.length + 1 }, ...data]);
+    } else setData([{ ...newData }, ...data]);
   };
 
   const onAddButtonClick = (): void => {
@@ -76,12 +73,9 @@ const UserPage = (): JSX.Element => {
           <Tab label="Your Tasks" />
         </Tabs>
       </AppBar>
-      <AllTasks
-        tabIndex={0}
-        currentTab={tabIndex}
-        data={data}
-        onEditClick={onEditButtonClick}
-      />
+      {tabIndex === 0 && (
+        <AllTasks data={data} onEditClick={onEditButtonClick} />
+      )}
       <Fab color="primary" onClick={onAddButtonClick} className={classes.fab}>
         <AddIcon />
       </Fab>

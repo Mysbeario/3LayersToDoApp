@@ -6,24 +6,23 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormGroup,
+  FormHelperText,
   InputLabel,
   makeStyles,
   MenuItem,
   Select,
-  Snackbar,
   TextField,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-import { Alert, Autocomplete } from "@material-ui/lab";
 import { TaskData, UserInfo } from ".";
+import { Controller, useForm } from "react-hook-form";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   editData?: Partial<TaskData>;
-  onChange: (newData: Omit<TaskData, "id">, oldData?: TaskData) => void;
+  onChange: (newData: TaskData, oldData?: TaskData) => void;
   forAdmin?: boolean;
   action: "create" | "update";
 }
@@ -45,14 +44,8 @@ const TaskForm = ({
   ...props
 }: Props): JSX.Element => {
   const classes = useStyles();
-  const [submitError, setSubmitError] = useState(false);
+  const { register, handleSubmit, errors, control } = useForm<TaskData>();
   const [users, setUser] = useState<UserInfo[]>([]);
-  const [title, setTitle] = useState<string>();
-  const [description, setDescription] = useState<string>();
-  const [owner, setOwner] = useState<UserInfo>();
-  const [status, setStatus] = useState<number>(0);
-  const [startDate, setStartDate] = useState<string>();
-  const [endDate, setEndDate] = useState<string>();
 
   useEffect(() => {
     (async () => {
@@ -61,135 +54,111 @@ const TaskForm = ({
     })();
   }, []);
 
-  useEffect(() => {
-    setTitle(editData?.title);
-    setDescription(editData?.description);
-    setOwner(editData?.owner);
-    setEndDate(editData?.endDate);
-    setStartDate(editData?.startDate);
-    setStatus(editData?.status || 0);
-  }, [editData]);
+  const add = async (data: TaskData): Promise<void> => {
+    const url = "/api/task";
+    console.table(data);
 
-  const add = async (): Promise<void> => {
-    console.table([title, description, status, owner, startDate, endDate]);
-    if (!title || !description || !owner || !startDate || !endDate) {
-      setSubmitError(true);
+    if (action === "create") {
+      const { data: lastId } = await Axios.post(url, data);
+      const { data: newData } = await Axios.get(`${url}/${lastId}`);
+      onChange(newData);
     } else {
-      const data = {
-        title,
-        description,
-        status,
-        owner,
-        startDate,
-        endDate,
-      };
-      const url = "/api/task";
-
-      if (action === "create") {
-        Axios.post(url, data);
-        onChange(data);
-      } else {
-        Axios.put(url, { ...data, id: editData?.id });
-        onChange(data, editData as TaskData);
-      }
-      props.onClose();
+      await Axios.put(url, { ...data, id: editData?.id });
+      const { data: newData } = await Axios.get(`${url}/${editData?.id}`);
+      onChange(newData, editData as TaskData);
     }
+    props.onClose();
   };
 
   return (
     <Dialog {...props}>
       <DialogTitle>Edit Task</DialogTitle>
-      <DialogContent>
-        <FormGroup className={classes.form}>
-          <FormControl>
-            <TextField
-              defaultValue={editData?.title}
-              onChange={(e) => setTitle(e.target.value)}
-              label="Title"
-            />
-          </FormControl>
-          <FormControl>
-            <TextField
-              defaultValue={editData?.description}
-              label="Description"
-              multiline
-              rows={4}
-              variant="outlined"
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </FormControl>
+      <form onSubmit={handleSubmit(add)}>
+        <DialogContent className={classes.form}>
+          <TextField
+            defaultValue={editData?.title}
+            name="title"
+            inputRef={register({ required: true })}
+            label="Title"
+            error={!!errors.title}
+            helperText="Required"
+          />
+          <TextField
+            defaultValue={editData?.description}
+            label="Description"
+            multiline
+            rows={4}
+            variant="outlined"
+            name="description"
+            inputRef={register({ required: true })}
+            error={!!errors.description}
+            helperText="Required"
+          />
           {forAdmin && (
             <>
               <FormControl>
-                <Autocomplete
-                  defaultValue={editData?.owner}
-                  options={users}
-                  getOptionLabel={(option: UserInfo) => option.name}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Owner" variant="outlined" />
-                  )}
-                  onChange={(_, value: UserInfo | null) =>
-                    setOwner(value || { id: 0, name: "" })
+                <InputLabel>Owner</InputLabel>
+                <Controller
+                  as={
+                    <Select error={!!errors.owner?.id}>
+                      {users.map((u) => (
+                        <MenuItem value={u.id}>{u.name}</MenuItem>
+                      ))}
+                    </Select>
                   }
+                  name="owner.id"
+                  rules={{ required: "Required" }}
+                  control={control}
+                  defaultValue={editData?.owner?.id}
                 />
+                {errors.owner?.id && <FormHelperText>Required</FormHelperText>}
               </FormControl>
               <FormControl>
                 <InputLabel>Status</InputLabel>
-                <Select
+                <Controller
+                  as={
+                    <Select error={!!errors.status}>
+                      <MenuItem value={0}>Doing</MenuItem>
+                      <MenuItem value={1}>Done</MenuItem>
+                    </Select>
+                  }
+                  name="status"
+                  control={control}
+                  rules={{ required: "Required" }}
                   defaultValue={editData?.status || 0}
-                  onChange={(e) => setStatus(e.target.value as number)}
-                >
-                  <MenuItem value={0}>Doing</MenuItem>
-                  <MenuItem value={1}>Done</MenuItem>
-                </Select>
+                />
+                {errors.status && <FormHelperText>Required</FormHelperText>}
               </FormControl>
             </>
           )}
-          <FormControl>
-            <TextField
-              defaultValue={editData?.startDate}
-              label="Start Date"
-              type="datetime-local"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={(e) =>
-                setStartDate(new Date(e.target.value).toISOString())
-              }
-            />
-          </FormControl>
-          <FormControl>
-            <TextField
-              defaultValue={editData?.endDate}
-              label="End Date"
-              type="datetime-local"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onChange={(e) =>
-                setEndDate(new Date(e.target.value).toISOString())
-              }
-            />
-          </FormControl>
-        </FormGroup>
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={props.onClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={add} color="primary">
-          Confirm
-        </Button>
-      </DialogActions>
-      <Snackbar
-        open={submitError}
-        autoHideDuration={6000}
-        onClose={() => setSubmitError(false)}
-      >
-        <Alert onClose={() => setSubmitError(false)} severity="error">
-          All fields must be filled!
-        </Alert>
-      </Snackbar>
+          <TextField
+            defaultValue={editData?.startDate}
+            label="Start Date"
+            type="datetime-local"
+            name="startDate"
+            inputRef={register({ required: true })}
+            error={!!errors.startDate}
+            helperText="Required"
+          />
+          <TextField
+            defaultValue={editData?.endDate}
+            label="End Date"
+            type="datetime-local"
+            name="endDate"
+            inputRef={register({ required: true })}
+            error={!!errors.endDate}
+            helperText="Required"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={props.onClose} color="primary">
+            Cancel
+          </Button>
+          <Button type="submit" color="primary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };

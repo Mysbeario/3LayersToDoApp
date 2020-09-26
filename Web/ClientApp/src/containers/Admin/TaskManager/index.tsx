@@ -30,15 +30,12 @@ const TaskManager = (): JSX.Element => {
   const [rowData, setRowData] = useState<TaskData>();
   const [formAction, setFormAction] = useState<"create" | "update">("create");
 
-  const onRowChange = (
-    newData: Omit<TaskData, "id">,
-    oldData?: TaskData
-  ): void => {
+  const onRowChange = (newData: TaskData, oldData?: TaskData): void => {
     if (oldData) {
       const updatedData = [...data];
       updatedData[data.indexOf(oldData)] = { ...newData, id: oldData.id };
       setData(updatedData);
-    } else setData([...data, { ...newData, id: data.length + 1 }]);
+    } else setData([...data, { ...newData }]);
   };
 
   const onRowDelete = (oldData: TaskData): Promise<void> =>
@@ -63,7 +60,6 @@ const TaskManager = (): JSX.Element => {
           {
             title: "ID",
             field: "id",
-            initialEditValue: data.length + 1,
             editable: "never",
           },
           { title: "Title", field: "title" },

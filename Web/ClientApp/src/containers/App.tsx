@@ -4,6 +4,7 @@ import Loading from "../components/Loading";
 
 const AdminPage = lazy(() => import("./Admin"));
 const UserPage = lazy(() => import("./User"));
+const HomePage = lazy(() => import("./Home"));
 
 const App = (): JSX.Element => {
   return (
@@ -11,6 +12,9 @@ const App = (): JSX.Element => {
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
+            <HomePage />
+          </Route>
+          <Route exact path="/user">
             <UserPage />
           </Route>
           <Route path="/admin">

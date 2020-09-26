@@ -67,7 +67,6 @@ const UserManager = (): JSX.Element => {
         {
           title: "ID",
           field: "id",
-          initialEditValue: data.length + 1,
           editable: "never",
         },
         { title: "Name", field: "name" },

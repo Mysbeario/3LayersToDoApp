@@ -4,8 +4,6 @@ import TaskCard from "../../../components/TaskCard";
 import { TaskData } from "../../Admin/TaskManager";
 
 interface Props {
-  tabIndex: number;
-  currentTab: number;
   data: TaskData[];
   onEditClick: (task: TaskData) => void;
 }
@@ -27,10 +25,9 @@ const AllTasks = (props: Props): JSX.Element => {
 
   return (
     <div className={classes.root}>
-      {props.tabIndex === props.currentTab &&
-        props.data.map((t) => (
-          <TaskCard data={t} onEditClick={props.onEditClick} />
-        ))}
+      {props.data.map((t) => (
+        <TaskCard data={t} onEditClick={props.onEditClick} />
+      ))}
     </div>
   );
 };

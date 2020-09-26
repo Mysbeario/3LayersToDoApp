@@ -12,8 +12,9 @@ namespace BLL {
 			return TaskDAL.GetTaskById (id);
 		}
 
-		public void AddTask (Task task) {
+		public int AddTask (Task task) {
 			TaskDAL.AddTask (task);
+			return TaskDAL.GetLastRowIndex ();
 		}
 
 		public void UpdateTask (Task task) {

@@ -19,8 +19,8 @@ namespace Web.Controllers {
 		}
 
 		[HttpPost]
-		public void AddNewTask (Task task) {
-			this.service.AddTask (task);
+		public int AddNewTask (Task task) {
+			return this.service.AddTask (task);
 		}
 
 		[HttpPut]
@@ -31,6 +31,11 @@ namespace Web.Controllers {
 		[HttpDelete ("{id}")]
 		public void DeleteTask (int id) {
 			this.service.DeleteTask (id);
+		}
+
+		[HttpGet ("{id}")]
+		public Task GetTaskById (int id) {
+			return this.service.GetTaskById (id);
 		}
 	}
 }
