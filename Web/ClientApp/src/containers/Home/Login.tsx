@@ -10,7 +10,6 @@ import { Alert } from "@material-ui/lab";
 import Axios from "axios";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import getCookie from "../../utilities/getCookie";
 import { accountState } from "../state";
@@ -45,7 +44,6 @@ const Login = (): JSX.Element => {
   const { register, errors, handleSubmit } = useForm<LoginInfo>();
   const [openAlert, setOpenAlert] = useState(false);
   const setAccountState = useSetRecoilState(accountState);
-  const history = useHistory();
 
   const login = async (loginInfo: LoginInfo): Promise<void> => {
     try {
@@ -54,7 +52,6 @@ const Login = (): JSX.Element => {
         id: parseInt(getCookie("cre.id")),
         role: parseInt(getCookie("cre.role")),
       });
-      history.push("/user");
     } catch (e) {
       setOpenAlert(true);
     }
