@@ -15,14 +15,15 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
-import { TaskData, UserInfo } from ".";
+import { TaskData, UserInfo } from "../containers/Admin/TaskManager";
 import { Controller, useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
+import { taskState } from "../containers/state";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   editData?: Partial<TaskData>;
-  onChange: (newData: TaskData, oldData?: TaskData) => void;
   forAdmin?: boolean;
   action: "create" | "update";
 }
@@ -38,12 +39,12 @@ const useStyles = makeStyles(() =>
 
 const TaskForm = ({
   editData,
-  onChange,
   forAdmin = true,
   action,
   ...props
 }: Props): JSX.Element => {
   const classes = useStyles();
+  const setTaskState = useSetRecoilState(taskState);
   const { register, handleSubmit, errors, control } = useForm<TaskData>();
   const [users, setUser] = useState<UserInfo[]>([]);
 
@@ -56,17 +57,26 @@ const TaskForm = ({
 
   const add = async (data: TaskData): Promise<void> => {
     const url = "/api/task";
-    console.table(data);
 
     if (action === "create") {
       const { data: lastId } = await Axios.post(url, data);
       const { data: newData } = await Axios.get(`${url}/${lastId}`);
-      onChange(newData);
+      setTaskState((cur) => [...cur, newData]);
     } else {
       await Axios.put(url, { ...data, id: editData?.id });
       const { data: newData } = await Axios.get(`${url}/${editData?.id}`);
-      onChange(newData, editData as TaskData);
+      setTaskState((cur) => {
+        const updatedData = [...cur];
+        updatedData[
+          cur.indexOf(cur.find((d) => d.id === editData?.id) as TaskData)
+        ] = {
+          ...newData,
+          id: editData?.id,
+        };
+        return updatedData;
+      });
     }
+
     props.onClose();
   };
 
@@ -134,7 +144,7 @@ const TaskForm = ({
           <TextField
             defaultValue={editData?.startDate}
             label="Start Date"
-            type="datetime-local"
+            type="date"
             name="startDate"
             inputRef={register({ required: true })}
             error={!!errors.startDate}
@@ -143,7 +153,7 @@ const TaskForm = ({
           <TextField
             defaultValue={editData?.endDate}
             label="End Date"
-            type="datetime-local"
+            type="date"
             name="endDate"
             inputRef={register({ required: true })}
             error={!!errors.endDate}

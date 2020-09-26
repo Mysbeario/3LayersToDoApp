@@ -10,8 +10,11 @@ import React, { useEffect, useState } from "react";
 import AllTasks from "./AllTasks";
 import { Add as AddIcon } from "@material-ui/icons";
 import { TaskData } from "../Admin/TaskManager";
-import TaskForm from "../Admin/TaskManager/TaskForm";
+import TaskForm from "../../components/TaskForm";
 import Axios from "axios";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { accountState, taskState } from "../state";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -28,20 +31,14 @@ const UserPage = (): JSX.Element => {
   const [tabIndex, setTabIndex] = useState(0);
   const [openForm, setOpenForm] = useState(false);
   const [editData, setEditData] = useState<Partial<TaskData>>();
-  const [data, setData] = useState<TaskData[]>([]);
+  const [data, setData] = useRecoilState(taskState);
+  const account = useRecoilValue(accountState);
   const [formAction, setFormAction] = useState<"create" | "update">("create");
-
-  const onRowChange = (newData: TaskData, oldData?: TaskData): void => {
-    if (oldData) {
-      const updatedData = [...data];
-      updatedData[data.indexOf(oldData)] = { ...newData, id: oldData.id };
-      setData(updatedData);
-    } else setData([{ ...newData }, ...data]);
-  };
+  const history = useHistory();
 
   const onAddButtonClick = (): void => {
     setEditData({
-      owner: { id: 1, name: "Phan Dung Tri" },
+      owner: { ...account },
       status: 0,
     });
     setFormAction("create");
@@ -55,6 +52,8 @@ const UserPage = (): JSX.Element => {
   };
 
   useEffect(() => {
+    if (!account.id) history.push("/");
+
     (async () => {
       const { data } = await Axios.get("/api/task");
       setData(data);
@@ -83,7 +82,6 @@ const UserPage = (): JSX.Element => {
         action={formAction}
         open={openForm}
         onClose={() => setOpenForm(false)}
-        onChange={onRowChange}
         editData={editData}
         forAdmin={false}
       />

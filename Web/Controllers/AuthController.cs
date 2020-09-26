@@ -24,6 +24,8 @@ namespace Web.Controllers {
 					if (u.Password == user.Password) {
 						Response.Cookies.Append ("cre.id", u.Id.ToString ());
 						Response.Cookies.Append ("cre.role", u.Role.ToString ());
+						Response.Cookies.Append ("cre.name", u.Name);
+						Response.Cookies.Append ("cre.email", u.Email);
 						return Ok ();
 					}
 					return Unauthorized ();

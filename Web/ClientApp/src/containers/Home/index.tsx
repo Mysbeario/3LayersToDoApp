@@ -12,7 +12,7 @@ const Home = (): JSX.Element => {
   const history = useHistory();
 
   useEffect(() => {
-    if (account.id && account.role !== -1) {
+    if (account.id && account.role !== -1 && account.email && account.name) {
       history.push("/user");
     }
   }, [account]);

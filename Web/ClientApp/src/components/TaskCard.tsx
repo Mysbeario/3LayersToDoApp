@@ -11,7 +11,6 @@ import {
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { TaskData } from "../containers/Admin/TaskManager";
-import convertDateToString from "../utilities/convertDateToString";
 import {
   ExpandMore as ExpandMoreIcon,
   Create as CreateIcon,
@@ -63,9 +62,8 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
       />
       <CardContent>
         <em className={classes.timeText}>
-          From {convertDateToString(new Date(data.startDate))}
-          &nbsp;To&nbsp;
-          {convertDateToString(new Date(data.endDate))}
+          {new Date(data.startDate).toDateString()}&nbsp;-&nbsp;
+          {new Date(data.endDate).toDateString()}
         </em>
       </CardContent>
       <CardActions disableSpacing>

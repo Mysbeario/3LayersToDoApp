@@ -7,7 +7,6 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import convertDateToString from "../../../utilities/convertDateToString";
 
 interface Props {
   title: string;
@@ -31,12 +30,7 @@ const TaskDetails = (props: Props): JSX.Element => {
 
   return (
     <Card className={classes.card}>
-      <CardHeader
-        title={props.title}
-        subheader={`By ${props.owner} | Start: ${convertDateToString(
-          new Date(props.startDate)
-        )} | End: ${convertDateToString(new Date(props.endDate))}`}
-      />
+      <CardHeader title={props.title} subheader={`By ${props.owner}`} />
       <CardContent>
         <Typography variant="body1" color="textPrimary" component="p">
           {props.description}

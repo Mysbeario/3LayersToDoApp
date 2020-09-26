@@ -19,8 +19,8 @@ namespace Web.Controllers {
 		}
 
 		[HttpPost]
-		public void AddUser (User user) {
-			this.service.AddUser (user);
+		public int AddUser (User user) {
+			return this.service.AddUser (user);
 		}
 
 		[HttpPut]
@@ -31,6 +31,11 @@ namespace Web.Controllers {
 		[HttpDelete ("{id}")]
 		public void DeleteUser (int id) {
 			this.service.DeleteUser (id);
+		}
+
+		[HttpGet ("{id}")]
+		public User GetUserById (int id) {
+			return this.service.GetUserById (id);
 		}
 	}
 }

@@ -20,8 +20,9 @@ const UserManager = (): JSX.Element => {
 
   const onRowAdd = (newData: UserData): Promise<void> =>
     (async () => {
-      await Axios.post(url, newData);
-      setData([...data, newData]);
+      const { data: newIndex } = await Axios.post(url, newData);
+      const { data: newUser } = await Axios.get(`${url}/${newIndex}`);
+      setData([...data, newUser]);
     })();
 
   const onRowUpdate = (newData: UserData, oldData?: UserData): Promise<void> =>
@@ -48,14 +49,14 @@ const UserManager = (): JSX.Element => {
 
   const onRowDelete = (oldData: UserData): Promise<void> =>
     (async () => {
-      await Axios.delete(`${url}${oldData.id}`);
+      await Axios.delete(`${url}/${oldData.id}`);
       setData(data.filter((d) => d !== oldData));
     })();
 
   useEffect(() => {
     (async () => {
       const { data } = await Axios.get(url);
-      setData(data as UserData[]);
+      setData(data);
     })();
   }, []);
 

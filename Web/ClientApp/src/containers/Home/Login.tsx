@@ -11,7 +11,7 @@ import Axios from "axios";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
-import getCookie from "../../utilities/getCookie";
+import getAccountInfo from "../../utilities/getAccountInfo";
 import { accountState } from "../state";
 
 const useStyles = makeStyles((theme) => ({
@@ -48,10 +48,7 @@ const Login = (): JSX.Element => {
   const login = async (loginInfo: LoginInfo): Promise<void> => {
     try {
       await Axios.post("/api/auth/login", loginInfo);
-      setAccountState({
-        id: parseInt(getCookie("cre.id")),
-        role: parseInt(getCookie("cre.role")),
-      });
+      setAccountState(getAccountInfo());
     } catch (e) {
       setOpenAlert(true);
     }

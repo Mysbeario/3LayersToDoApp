@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import MaterialTable from "material-table";
 import TableIcons from "../../../components/TableIcons";
-import convertDateToString from "../../../utilities/convertDateToString";
 import TaskDetails from "./TaskDetails";
-import TaskForm from "./TaskForm";
+import TaskForm from "../../../components/TaskForm";
 import { Add as AddIcon, Edit as EditIcon } from "@material-ui/icons";
+import { useRecoilState } from "recoil";
+import { taskState } from "../../state";
 
 interface UserInfo {
   id: number;
@@ -25,29 +26,21 @@ interface TaskData {
 const url = "/api/task";
 
 const TaskManager = (): JSX.Element => {
-  const [data, setData] = useState<TaskData[]>([]);
+  const [taskData, setTaskData] = useRecoilState(taskState);
   const [openForm, setOpenForm] = useState(false);
   const [rowData, setRowData] = useState<TaskData>();
   const [formAction, setFormAction] = useState<"create" | "update">("create");
 
-  const onRowChange = (newData: TaskData, oldData?: TaskData): void => {
-    if (oldData) {
-      const updatedData = [...data];
-      updatedData[data.indexOf(oldData)] = { ...newData, id: oldData.id };
-      setData(updatedData);
-    } else setData([...data, { ...newData }]);
-  };
-
   const onRowDelete = (oldData: TaskData): Promise<void> =>
     (async () => {
       await Axios.delete(`${url}/${oldData.id}`);
-      setData(data.filter((d) => d !== oldData));
+      setTaskData(taskData.filter((d) => d !== oldData));
     })();
 
   useEffect(() => {
     (async () => {
       const { data } = await Axios.get(url);
-      setData(data as TaskData[]);
+      setTaskData(data);
     })();
   }, []);
 
@@ -78,17 +71,17 @@ const TaskManager = (): JSX.Element => {
             field: "startDate",
             initialEditValue: new Date().toISOString(),
             render: (rowData: TaskData) =>
-              convertDateToString(new Date(rowData.startDate ?? Date.now())),
+              new Date(rowData.startDate || Date.now()).toDateString(),
           },
           {
             title: "End Date",
             field: "endDate",
             initialEditValue: new Date().toISOString(),
             render: (rowData: TaskData) =>
-              convertDateToString(new Date(rowData.endDate ?? Date.now())),
+              new Date(rowData.endDate || Date.now()).toDateString(),
           },
         ]}
-        data={data}
+        data={taskData.map((d) => ({ ...d }))}
         editable={{ onRowDelete }}
         detailPanel={({ owner, status, ...data }: TaskData) => (
           <TaskDetails {...data} owner={owner.name} />
@@ -108,7 +101,10 @@ const TaskManager = (): JSX.Element => {
             icon: () => <EditIcon />,
             tooltip: "Edit Task",
             onClick: (_, oldData) => {
-              setRowData(oldData as TaskData);
+              const data = oldData as TaskData;
+              data.startDate = data.startDate.substring(0, 10);
+              data.endDate = data.endDate.substring(0, 10);
+              setRowData(data as TaskData);
               setFormAction("update");
               setOpenForm(true);
             },
@@ -118,7 +114,6 @@ const TaskManager = (): JSX.Element => {
       <TaskForm
         open={openForm}
         editData={rowData}
-        onChange={onRowChange}
         onClose={(): void => setOpenForm(false)}
         action={formAction}
       />

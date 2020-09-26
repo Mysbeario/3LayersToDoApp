@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useEffect } from "react";
 import {
   AppBar,
   Typography,
@@ -8,7 +8,9 @@ import {
   createStyles,
 } from "@material-ui/core";
 import CategoryMenu from "./CategoryMenu";
-import { Route, Switch, useRouteMatch } from "react-router-dom";
+import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { accountState } from "../state";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -25,6 +27,12 @@ const TaskManager = lazy(() => import("./TaskManager"));
 const Admin = (): JSX.Element => {
   const classes = useStyles();
   const { path } = useRouteMatch();
+  const account = useRecoilValue(accountState);
+  const history = useHistory();
+
+  useEffect(() => {
+    if (!account.id) history.push("/");
+  }, [account]);
 
   return (
     <div className={classes.root}>

@@ -12,8 +12,9 @@ namespace BLL {
             return UserDAL.GetUserById (id);
         }
 
-        public void AddUser (User user) {
+        public int AddUser (User user) {
             UserDAL.AddUser (user);
+            return UserDAL.GetLastRowIndex ();
         }
 
         public void UpdateUser (User user) {

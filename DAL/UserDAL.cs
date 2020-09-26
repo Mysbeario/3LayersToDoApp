@@ -92,5 +92,18 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@UserId", id);
 			command.ExecuteNonQuery ();
 		}
+
+		public static int GetLastRowIndex () {
+			DAL.ConnectDb ();
+
+			string query = "SELECT MAX(Id) FROM " + TableName;
+			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
+			SQLiteDataReader reader = command.ExecuteReader ();
+			int id = 0;
+
+			while (reader.Read ()) id = reader.GetInt32 (0);
+
+			return id;
+		}
 	}
 }
