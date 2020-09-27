@@ -9,19 +9,20 @@ import {
   Divider,
   IconButton,
   makeStyles,
-  Paper,
+  Typography,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { TaskData } from "../containers/Admin/TaskManager";
 import {
   ExpandMore as ExpandMoreIcon,
-  Create as CreateIcon,
+  Create as EditIcon,
   InsertComment as CommentIcon,
-  CheckBoxOutlineBlank as UncheckIcon,
-  CheckBox as CheckIcon,
-  RemoveCircle as RemoveIcon,
+  CheckBoxOutlineBlank as DoingIcon,
+  CheckBox as DoneIcon,
+  AssignmentLate as OverdueIcon,
 } from "@material-ui/icons";
 import clsx from "clsx";
+import PartnerShowcase from "./PartnerShowcase";
 
 interface Props {
   data: TaskData;
@@ -30,6 +31,9 @@ interface Props {
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    card: {
+      backgroundColor: "#FFFF88",
+    },
     timeText: {
       fontSize: "12px",
       color: "#474747",
@@ -44,15 +48,6 @@ const useStyles = makeStyles((theme) =>
     expandOpen: {
       transform: "rotate(180deg)",
     },
-    chipArr: {
-      display: "flex",
-      justifyContent: "center",
-      flexWrap: "wrap",
-      listStyle: "none",
-      width: "max-content",
-      padding: theme.spacing(0.5),
-      marginTop: "1rem",
-    },
     chip: {
       margin: theme.spacing(0.5),
     },
@@ -64,25 +59,42 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card>
+    <Card className={classes.card}>
       <CardHeader
-        title={data.title}
+        disableTypography
+        title={
+          <span style={{ fontWeight: "bold" }}>
+            {data.title}&nbsp;
+            {data.isPrivate && (
+              <Chip
+                color="secondary"
+                variant="outlined"
+                size="small"
+                label="private"
+                className={classes.chip}
+              />
+            )}
+          </span>
+        }
         subheader={
-          <>
-            By{" "}
+          <Typography color="textSecondary" variant="subtitle2">
+            By&nbsp;
             <Chip
+              size="small"
               color="secondary"
               label={data.owner.name}
               className={classes.chip}
             />
-          </>
+          </Typography>
         }
         action={
           <IconButton>
-            {data.status ? (
-              <CheckIcon style={{ color: "green" }} />
+            {data.status === 1 ? (
+              <DoneIcon style={{ color: "green" }} />
+            ) : data.status === 0 ? (
+              <DoingIcon />
             ) : (
-              <UncheckIcon />
+              <OverdueIcon style={{ color: "red" }} />
             )}
           </IconButton>
         }
@@ -92,21 +104,16 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
           {new Date(data.startDate).toDateString()}&nbsp;-&nbsp;
           {new Date(data.endDate).toDateString()}
         </em>
-        <Paper component="ul" className={classes.chipArr}>
-          {data.partners.map((p) => (
-            <Chip color="primary" label={p.name} className={classes.chip} />
-          ))}
-        </Paper>
+        {!!data.partners.length && <PartnerShowcase data={data.partners} />}
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton onClick={(): void => onEditClick(data)}>
-          <CreateIcon />
-        </IconButton>
+        {data.status === 0 && (
+          <IconButton onClick={(): void => onEditClick(data)}>
+            <EditIcon />
+          </IconButton>
+        )}
         <IconButton>
           <CommentIcon />
-        </IconButton>
-        <IconButton>
-          <RemoveIcon />
         </IconButton>
         <IconButton
           className={clsx(classes.expand, {

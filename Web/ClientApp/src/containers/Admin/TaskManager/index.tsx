@@ -35,7 +35,7 @@ const url = "/api/task";
 const TaskManager = (): JSX.Element => {
   const [taskData, setTaskData] = useRecoilState(taskState);
   const [openForm, setOpenForm] = useState(false);
-  const [rowData, setRowData] = useState<TaskData>();
+  const [rowData, setRowData] = useState<Partial<TaskData>>();
   const [formAction, setFormAction] = useState<"create" | "update">("create");
 
   const onRowDelete = (oldData: TaskData): Promise<void> =>
@@ -66,7 +66,7 @@ const TaskManager = (): JSX.Element => {
           {
             title: "Status",
             field: "status",
-            lookup: { 0: "Doing", 1: "Done" },
+            lookup: { 0: "Doing", 1: "Done", 2: "Overdue" },
           },
           {
             title: "Owner",
@@ -110,7 +110,7 @@ const TaskManager = (): JSX.Element => {
             tooltip: "Add Task",
             isFreeAction: true,
             onClick: () => {
-              setRowData(undefined);
+              setRowData({});
               setFormAction("create");
               setOpenForm(true);
             },

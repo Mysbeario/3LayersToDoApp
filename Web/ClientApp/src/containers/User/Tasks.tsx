@@ -1,7 +1,7 @@
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
-import TaskCard from "../../../components/TaskCard";
-import { TaskData } from "../../Admin/TaskManager";
+import TaskCard from "../../components/TaskCard";
+import { TaskData } from "../Admin/TaskManager";
 
 interface Props {
   data: TaskData[];

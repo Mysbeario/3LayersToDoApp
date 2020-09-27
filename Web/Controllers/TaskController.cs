@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BLL;
 using Core.Models;
@@ -15,7 +16,19 @@ namespace Web.Controllers {
 
 		[HttpGet]
 		public IEnumerable<Task> GetAllTasks () {
-			return this.service.GetAllTasks ().ToArray ();
+			int role = Int16.Parse (Request.Cookies["cre.role"]);
+			int id = Int16.Parse (Request.Cookies["cre.id"]);
+			List<Task> result = this.service.GetAllTasks ();
+
+			if (role == 1)
+				return result.ToArray ();
+			else {
+				return result
+					.FindAll (t => !t.IsPrivate ||
+						t.Owner.Id == id ||
+						t.Partners.Exists (p => p.Id == id))
+					.ToArray ();
+			}
 		}
 
 		[HttpPost]

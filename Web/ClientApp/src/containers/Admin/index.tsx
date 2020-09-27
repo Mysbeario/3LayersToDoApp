@@ -11,6 +11,7 @@ import CategoryMenu from "./CategoryMenu";
 import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { accountState } from "../state";
+import AppBarAction from "../../components/AppBarAction";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -32,13 +33,17 @@ const Admin = (): JSX.Element => {
 
   useEffect(() => {
     if (!account.id) history.push("/");
+    else if (!account.role) history.push("/user");
   }, [account]);
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">Administrator</Typography>
+          <Typography style={{ flexGrow: 1 }} variant="h6">
+            Administrator
+          </Typography>
+          <AppBarAction />
         </Toolbar>
       </AppBar>
       <Grid container spacing={1}>

@@ -5,6 +5,7 @@ namespace Core.Models {
 	public enum TaskStatus {
 		Doing,
 		Done,
+		Overdue,
 	}
 
 	public class Task : Entity {

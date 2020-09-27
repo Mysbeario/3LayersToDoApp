@@ -15,7 +15,7 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import { TaskData, UserInfo } from "../containers/Admin/TaskManager";
 import { Controller, useForm } from "react-hook-form";
@@ -71,7 +71,9 @@ const TaskForm = ({
 
     const postedData: TaskData = {
       ...data,
-      partners: data.partners.filter((p) => p.id !== data.owner.id),
+      partners: data.partners
+        ? data.partners.filter((p) => p.id !== data.owner.id)
+        : [],
     };
 
     if (action === "create") {
@@ -154,6 +156,7 @@ const TaskForm = ({
             {errors.status && <FormHelperText>Required</FormHelperText>}
           </FormControl>
           <TextField
+            disabled={!forAdmin}
             defaultValue={editData?.startDate}
             label="Start Date"
             type="date"
@@ -163,6 +166,7 @@ const TaskForm = ({
             helperText="Required"
           />
           <TextField
+            disabled={!forAdmin}
             defaultValue={editData?.endDate}
             label="End Date"
             type="date"

@@ -2,36 +2,51 @@ import {
   AppBar,
   createStyles,
   Fab,
+  Grid,
+  IconButton,
   makeStyles,
   Tab,
   Tabs,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import AllTasks from "./AllTasks";
+import Tasks from "./Tasks";
 import { Add as AddIcon } from "@material-ui/icons";
 import { TaskData } from "../Admin/TaskManager";
 import TaskForm from "../../components/TaskForm";
 import Axios from "axios";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { accountState, taskState } from "../state";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  accountState,
+  filterTaskState,
+  isOnlyMineState,
+  taskState,
+} from "../state";
 import { useHistory } from "react-router-dom";
+import FilterMenu from "./FilterMenu";
+import AppBarAction from "../../components/AppBarAction";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     fab: {
-      position: "absolute",
+      position: "fixed",
       bottom: theme.spacing(2),
       right: theme.spacing(2),
+    },
+    tabs: {
+      flexGrow: 1,
     },
   })
 );
 
 const UserPage = (): JSX.Element => {
   const classes = useStyles();
-  const [tabIndex, setTabIndex] = useState(0);
   const [openForm, setOpenForm] = useState(false);
   const [editData, setEditData] = useState<Partial<TaskData>>();
-  const [data, setData] = useRecoilState(taskState);
+  const [isOnlyMine, setIsOnlyMine] = useRecoilState(isOnlyMineState);
+  const setTaskList = useSetRecoilState(taskState);
+  const taskList = useRecoilValue(filterTaskState);
   const account = useRecoilValue(accountState);
   const [formAction, setFormAction] = useState<"create" | "update">("create");
   const history = useHistory();
@@ -54,31 +69,40 @@ const UserPage = (): JSX.Element => {
     });
     setOpenForm(true);
   };
+  useEffect(() => {
+    (async () => {
+      const { data } = await Axios.get("/api/task");
+      setTaskList(data);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!account.id) history.push("/");
-
-    (async () => {
-      const { data } = await Axios.get("/api/task");
-      setData(data);
-    })();
-  }, []);
+  }, [account]);
 
   return (
     <div>
       <AppBar position="sticky">
-        <Tabs
-          value={tabIndex}
-          onChange={(_, newValue: number) => setTabIndex(newValue)}
-          centered
-        >
-          <Tab label="All Tasks" />
-          <Tab label="Your Tasks" />
-        </Tabs>
+        <Toolbar>
+          <Typography variant="h6">Welcome, {account.name}</Typography>
+          <Tabs
+            className={classes.tabs}
+            value={isOnlyMine}
+            onChange={(_, newValue: number) => setIsOnlyMine(newValue)}
+            centered
+          >
+            <Tab label="All Tasks" />
+            <Tab label="Your Tasks" />
+          </Tabs>
+          <AppBarAction />
+        </Toolbar>
       </AppBar>
-      {tabIndex === 0 && (
-        <AllTasks data={data} onEditClick={onEditButtonClick} />
-      )}
+      <Grid container>
+        <FilterMenu />
+        <Grid item xs={10}>
+          <Tasks data={taskList} onEditClick={onEditButtonClick} />
+        </Grid>
+      </Grid>
       <Fab color="primary" onClick={onAddButtonClick} className={classes.fab}>
         <AddIcon />
       </Fab>

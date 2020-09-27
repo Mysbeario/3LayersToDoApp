@@ -1,15 +1,29 @@
+using System;
 using System.Collections.Generic;
 using Core.Models;
 using DAL;
 
 namespace BLL {
 	public class TaskBLL {
+		private void CheckOverdue (Task t) {
+			if (t.EndDate.CompareTo (DateTime.Now) < 0 && t.Status == TaskStatus.Doing) {
+				t.Status = TaskStatus.Overdue;
+			}
+		}
 		public List<Task> GetAllTasks () {
-			return TaskDAL.GetAllTasks ();
+			List<Task> tasks = TaskDAL.GetAllTasks ();
+
+			foreach (Task t in tasks) {
+				CheckOverdue (t);
+			}
+
+			return tasks;
 		}
 
 		public Task GetTaskById (int id) {
-			return TaskDAL.GetTaskById (id);
+			Task task = TaskDAL.GetTaskById (id);
+			CheckOverdue (task);
+			return task;
 		}
 
 		public int AddTask (Task task) {

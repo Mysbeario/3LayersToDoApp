@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { UserInfo } from ".";
+import PartnerShowcase from "../../../components/PartnerShowcase";
 
 interface Props {
   title: string;
@@ -24,18 +25,6 @@ const useStyles = makeStyles((theme) =>
       margin: "1rem",
       backgroundColor: "#f5f5f5",
     },
-    chipArr: {
-      display: "flex",
-      justifyContent: "center",
-      flexWrap: "wrap",
-      listStyle: "none",
-      width: "max-content",
-      padding: theme.spacing(0.5),
-      marginTop: "1rem",
-    },
-    chip: {
-      margin: theme.spacing(0.5),
-    },
   })
 );
 
@@ -49,11 +38,7 @@ const TaskDetails = (props: Props): JSX.Element => {
         <Typography variant="body1" color="textPrimary" component="p">
           {props.description}
         </Typography>
-        <Paper component="ul" className={classes.chipArr}>
-          {props.partners.map((p) => (
-            <Chip color="primary" label={p.name} className={classes.chip} />
-          ))}
-        </Paper>
+        <PartnerShowcase data={props.partners} />
       </CardContent>
     </Card>
   );
