@@ -78,6 +78,8 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@IsPrivate", t.IsPrivate);
 			command.ExecuteNonQuery ();
 
+			t.Id = GetLastRowIndex ();
+
 			foreach (User u in t.Partners) {
 				PartnerDAL.AddPartner (t, u);
 			}

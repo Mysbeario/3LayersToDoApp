@@ -46,13 +46,25 @@ const TaskForm = ({
 }: Props): JSX.Element => {
   const classes = useStyles();
   const setTaskState = useSetRecoilState(taskState);
-  const { register, handleSubmit, errors, control, setValue } = useForm<
-    TaskData
-  >();
+  const {
+    register,
+    handleSubmit,
+    errors,
+    control,
+    setValue,
+    getValues,
+  } = useForm<TaskData>();
   const [users, setUser] = useState<UserInfo[]>([]);
+  const [, forceUpdate] = useState(false);
 
   useEffect(() => {
     register({ name: "partners" });
+
+    if (!forAdmin) {
+      setValue("owner", editData?.owner);
+      setValue("status", editData?.status);
+    }
+
     (async () => {
       const { data } = await Axios.get("/api/user");
       setUser(data);
@@ -114,7 +126,10 @@ const TaskForm = ({
                 <InputLabel>Owner</InputLabel>
                 <Controller
                   as={
-                    <Select error={!!errors.owner?.id}>
+                    <Select
+                      error={!!errors.owner?.id}
+                      onChange={() => forceUpdate((s) => !s)}
+                    >
                       {users.map((u) => (
                         <MenuItem value={u.id}>{u.name}</MenuItem>
                       ))}
@@ -165,7 +180,7 @@ const TaskForm = ({
           />
           <Autocomplete
             multiple
-            options={users}
+            options={users.filter((u) => u.id !== getValues("owner")?.id)}
             getOptionLabel={(option: UserInfo) => option.name}
             renderInput={(params) => (
               <TextField {...params} label="Partners" placeholder="Favorites" />

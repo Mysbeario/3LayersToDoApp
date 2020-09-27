@@ -19,13 +19,8 @@ namespace DAL {
 
 			while (reader.HasRows) {
 				while (reader.Read ()) {
-					User u = new User ();
-					u.Id = reader.GetInt32 (0);
-					u.Name = reader.GetString (1);
-					u.Email = reader.GetString (2);
-					u.Password = reader.GetString (3);
-					u.Role = reader.GetInt32 (4);
-					data.Add (u);
+					int uId = reader.GetInt32 (1);
+					data.Add (UserDAL.GetUserById (uId));
 				}
 
 				reader.NextResult ();
