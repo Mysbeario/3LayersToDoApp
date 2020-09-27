@@ -122,7 +122,7 @@ const TaskManager = (): JSX.Element => {
               const data = oldData as TaskData;
               data.startDate = data.startDate.substring(0, 10);
               data.endDate = data.endDate.substring(0, 10);
-              setRowData(data as TaskData);
+              setRowData(data);
               setFormAction("update");
               setOpenForm(true);
             },

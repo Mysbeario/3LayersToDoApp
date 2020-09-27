@@ -1,11 +1,13 @@
 import {
   Button,
+  Checkbox,
   createStyles,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   InputLabel,
   makeStyles,
@@ -13,7 +15,7 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Axios from "axios";
 import { TaskData, UserInfo } from "../containers/Admin/TaskManager";
 import { Controller, useForm } from "react-hook-form";
@@ -46,24 +48,13 @@ const TaskForm = ({
 }: Props): JSX.Element => {
   const classes = useStyles();
   const setTaskState = useSetRecoilState(taskState);
-  const {
-    register,
-    handleSubmit,
-    errors,
-    control,
-    setValue,
-    getValues,
-  } = useForm<TaskData>();
+  const { register, handleSubmit, errors, control, setValue } = useForm<
+    TaskData
+  >();
   const [users, setUser] = useState<UserInfo[]>([]);
-  const [, forceUpdate] = useState(false);
 
   useEffect(() => {
     register({ name: "partners" });
-
-    if (!forAdmin) {
-      setValue("owner", editData?.owner);
-      setValue("status", editData?.status);
-    }
 
     (async () => {
       const { data } = await Axios.get("/api/user");
@@ -71,15 +62,24 @@ const TaskForm = ({
     })();
   }, []);
 
+  useEffect(() => {
+    setValue("partners", editData?.partners);
+  }, [editData]);
+
   const add = async (data: TaskData): Promise<void> => {
     const url = "/api/task";
 
+    const postedData: TaskData = {
+      ...data,
+      partners: data.partners.filter((p) => p.id !== data.owner.id),
+    };
+
     if (action === "create") {
-      const { data: lastId } = await Axios.post(url, data);
+      const { data: lastId } = await Axios.post(url, postedData);
       const { data: newData } = await Axios.get(`${url}/${lastId}`);
       setTaskState((cur) => [...cur, newData]);
     } else {
-      await Axios.put(url, { ...data, id: editData?.id });
+      await Axios.put(url, { ...postedData, id: editData?.id });
       const { data: newData } = await Axios.get(`${url}/${editData?.id}`);
       setTaskState((cur) => {
         const updatedData = [...cur];
@@ -120,46 +120,39 @@ const TaskForm = ({
             error={!!errors.description}
             helperText="Required"
           />
-          {forAdmin && (
-            <>
-              <FormControl>
-                <InputLabel>Owner</InputLabel>
-                <Controller
-                  as={
-                    <Select
-                      error={!!errors.owner?.id}
-                      onChange={() => forceUpdate((s) => !s)}
-                    >
-                      {users.map((u) => (
-                        <MenuItem value={u.id}>{u.name}</MenuItem>
-                      ))}
-                    </Select>
-                  }
-                  name="owner.id"
-                  rules={{ required: "Required" }}
-                  control={control}
-                  defaultValue={editData?.owner?.id}
-                />
-                {errors.owner?.id && <FormHelperText>Required</FormHelperText>}
-              </FormControl>
-              <FormControl>
-                <InputLabel>Status</InputLabel>
-                <Controller
-                  as={
-                    <Select error={!!errors.status}>
-                      <MenuItem value={0}>Doing</MenuItem>
-                      <MenuItem value={1}>Done</MenuItem>
-                    </Select>
-                  }
-                  name="status"
-                  control={control}
-                  rules={{ required: "Required" }}
-                  defaultValue={editData?.status || 0}
-                />
-                {errors.status && <FormHelperText>Required</FormHelperText>}
-              </FormControl>
-            </>
-          )}
+          <FormControl disabled={!forAdmin}>
+            <InputLabel>Owner</InputLabel>
+            <Controller
+              as={
+                <Select error={!!errors.owner?.id}>
+                  {users.map((u) => (
+                    <MenuItem value={u.id}>{u.name}</MenuItem>
+                  ))}
+                </Select>
+              }
+              name="owner.id"
+              rules={{ required: "Required" }}
+              control={control}
+              defaultValue={editData?.owner?.id}
+            />
+            {errors.owner?.id && <FormHelperText>Required</FormHelperText>}
+          </FormControl>
+          <FormControl disabled={!forAdmin}>
+            <InputLabel>Status</InputLabel>
+            <Controller
+              as={
+                <Select error={!!errors.status}>
+                  <MenuItem value={0}>Doing</MenuItem>
+                  <MenuItem value={1}>Done</MenuItem>
+                </Select>
+              }
+              name="status"
+              control={control}
+              rules={{ required: "Required" }}
+              defaultValue={editData?.status || 0}
+            />
+            {errors.status && <FormHelperText>Required</FormHelperText>}
+          </FormControl>
           <TextField
             defaultValue={editData?.startDate}
             label="Start Date"
@@ -180,12 +173,19 @@ const TaskForm = ({
           />
           <Autocomplete
             multiple
-            options={users.filter((u) => u.id !== getValues("owner")?.id)}
+            defaultValue={editData?.partners}
+            options={users}
             getOptionLabel={(option: UserInfo) => option.name}
             renderInput={(params) => (
               <TextField {...params} label="Partners" placeholder="Favorites" />
             )}
             onChange={(_, values) => setValue("partners", values)}
+          />
+          <FormControlLabel
+            control={<Checkbox defaultChecked={editData?.isPrivate} />}
+            label="Is Private?"
+            name="isPrivate"
+            inputRef={register}
           />
         </DialogContent>
         <DialogActions>

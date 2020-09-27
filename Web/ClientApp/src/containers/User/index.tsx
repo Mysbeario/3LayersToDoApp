@@ -47,7 +47,11 @@ const UserPage = (): JSX.Element => {
 
   const onEditButtonClick = (data: TaskData): void => {
     setFormAction("update");
-    setEditData(data);
+    setEditData({
+      ...data,
+      startDate: data.startDate.substring(0, 10),
+      endDate: data.endDate.substring(0, 10),
+    });
     setOpenForm(true);
   };
 

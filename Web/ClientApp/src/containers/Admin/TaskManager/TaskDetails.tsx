@@ -29,8 +29,9 @@ const useStyles = makeStyles((theme) =>
       justifyContent: "center",
       flexWrap: "wrap",
       listStyle: "none",
+      width: "max-content",
       padding: theme.spacing(0.5),
-      margin: 0,
+      marginTop: "1rem",
     },
     chip: {
       margin: theme.spacing(0.5),
@@ -50,7 +51,7 @@ const TaskDetails = (props: Props): JSX.Element => {
         </Typography>
         <Paper component="ul" className={classes.chipArr}>
           {props.partners.map((p) => (
-            <Chip label={p.name} className={classes.chip} />
+            <Chip color="primary" label={p.name} className={classes.chip} />
           ))}
         </Paper>
       </CardContent>

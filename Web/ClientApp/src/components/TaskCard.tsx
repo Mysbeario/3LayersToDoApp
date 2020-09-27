@@ -3,11 +3,13 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Collapse,
   createStyles,
   Divider,
   IconButton,
   makeStyles,
+  Paper,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { TaskData } from "../containers/Admin/TaskManager";
@@ -42,6 +44,18 @@ const useStyles = makeStyles((theme) =>
     expandOpen: {
       transform: "rotate(180deg)",
     },
+    chipArr: {
+      display: "flex",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      listStyle: "none",
+      width: "max-content",
+      padding: theme.spacing(0.5),
+      marginTop: "1rem",
+    },
+    chip: {
+      margin: theme.spacing(0.5),
+    },
   })
 );
 
@@ -53,10 +67,23 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
     <Card>
       <CardHeader
         title={data.title}
-        subheader={`By ${data.owner.name}`}
+        subheader={
+          <>
+            By{" "}
+            <Chip
+              color="secondary"
+              label={data.owner.name}
+              className={classes.chip}
+            />
+          </>
+        }
         action={
           <IconButton>
-            {data.status ? <CheckIcon /> : <UncheckIcon />}
+            {data.status ? (
+              <CheckIcon style={{ color: "green" }} />
+            ) : (
+              <UncheckIcon />
+            )}
           </IconButton>
         }
       />
@@ -65,6 +92,11 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
           {new Date(data.startDate).toDateString()}&nbsp;-&nbsp;
           {new Date(data.endDate).toDateString()}
         </em>
+        <Paper component="ul" className={classes.chipArr}>
+          {data.partners.map((p) => (
+            <Chip color="primary" label={p.name} className={classes.chip} />
+          ))}
+        </Paper>
       </CardContent>
       <CardActions disableSpacing>
         <IconButton onClick={(): void => onEditClick(data)}>
