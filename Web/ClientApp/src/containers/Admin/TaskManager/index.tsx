@@ -3,10 +3,15 @@ import Axios from "axios";
 import MaterialTable from "material-table";
 import TableIcons from "../../../components/TableIcons";
 import TaskDetails from "./TaskDetails";
-import TaskForm from "../../../components/TaskForm";
-import { Add as AddIcon, Edit as EditIcon } from "@material-ui/icons";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  CheckCircle as CheckCircleIcon,
+  Cancel as CancelIcon,
+} from "@material-ui/icons";
 import { useRecoilState } from "recoil";
 import { taskState } from "../../state";
+import TaskForm from "../../../components/TaskForm";
 
 interface UserInfo {
   id: number;
@@ -16,11 +21,13 @@ interface UserInfo {
 interface TaskData {
   id: number;
   owner: UserInfo;
+  partners: UserInfo[];
   title: string;
   description: string;
   status: number;
   startDate: string;
   endDate: string;
+  isPrivate: boolean;
 }
 
 const url = "/api/task";
@@ -34,7 +41,7 @@ const TaskManager = (): JSX.Element => {
   const onRowDelete = (oldData: TaskData): Promise<void> =>
     (async () => {
       await Axios.delete(`${url}/${oldData.id}`);
-      setTaskData(taskData.filter((d) => d !== oldData));
+      setTaskData(taskData.filter((d) => d.id !== oldData.id));
     })();
 
   useEffect(() => {
@@ -79,6 +86,17 @@ const TaskManager = (): JSX.Element => {
             initialEditValue: new Date().toISOString(),
             render: (rowData: TaskData) =>
               new Date(rowData.endDate || Date.now()).toDateString(),
+          },
+          {
+            title: "Private",
+            field: "isPrivate",
+            initialEditValue: false,
+            render: (rowData: TaskData) =>
+              rowData.isPrivate ? (
+                <CheckCircleIcon style={{ color: "green" }} />
+              ) : (
+                <CancelIcon style={{ color: "red" }} />
+              ),
           },
         ]}
         data={taskData.map((d) => ({ ...d }))}

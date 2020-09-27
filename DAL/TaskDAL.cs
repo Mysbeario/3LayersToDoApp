@@ -6,6 +6,7 @@ using Core.Models;
 namespace DAL {
 	public static class TaskDAL {
 		private static string TableName = "Tasks";
+
 		public static List<Task> GetAllTasks () {
 			DAL.ConnectDb ();
 
@@ -24,6 +25,8 @@ namespace DAL {
 					t.Status = (TaskStatus) reader.GetInt32 (4);
 					t.StartDate = DateTime.Parse (reader.GetString (5));
 					t.EndDate = DateTime.Parse (reader.GetString (6));
+					t.IsPrivate = reader.GetBoolean (7);
+					t.Partners = PartnerDAL.GetAllPartners (t);
 					data.Add (t);
 				}
 
@@ -52,6 +55,8 @@ namespace DAL {
 				t.Status = (TaskStatus) Int32.Parse (reader["Status"].ToString ());
 				t.StartDate = DateTime.Parse (reader["StartDate"].ToString ());
 				t.EndDate = DateTime.Parse (reader["EndDate"].ToString ());
+				t.IsPrivate = Boolean.Parse (reader["IsPrivate"].ToString () == "1" ? "true" : "false");
+				t.Partners = PartnerDAL.GetAllPartners (t);
 			}
 
 			return t;
@@ -60,8 +65,8 @@ namespace DAL {
 		public static void AddTask (Task t) {
 			DAL.ConnectDb ();
 
-			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, StartDate, EndDate) " +
-				"VALUES (@OwnerId, @Title, @Description, @Status, @StartDate, @EndDate)";
+			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, StartDate, EndDate, IsPrivate) " +
+				"VALUES (@OwnerId, @Title, @Description, @Status, @StartDate, @EndDate, @IsPrivate)";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@OwnerId", t.Owner.Id);
@@ -70,14 +75,19 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@Status", t.Status);
 			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
 			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
+			command.Parameters.AddWithValue ("@IsPrivate", t.IsPrivate);
 			command.ExecuteNonQuery ();
+
+			foreach (User u in t.Partners) {
+				PartnerDAL.AddPartner (t, u);
+			}
 		}
 
 		public static void UpdateTask (Task t) {
 			DAL.ConnectDb ();
 
 			string query = "UPDATE " + TableName + " SET " +
-				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, StartDate = @StartDate, EndDate = @EndDate " +
+				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, StartDate = @StartDate, EndDate = @EndDate, IsPrivate = @IsPrivate " +
 				"WHERE Id = @TaskId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
@@ -88,7 +98,10 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@Status", t.Status);
 			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
 			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
+			command.Parameters.AddWithValue ("@IsPrivate", t.IsPrivate);
 			command.ExecuteNonQuery ();
+
+			PartnerDAL.UpdatePartners (t);
 		}
 
 		public static void DeleteTask (int id) {
@@ -99,6 +112,8 @@ namespace DAL {
 
 			command.Parameters.AddWithValue ("@TaskId", id);
 			command.ExecuteNonQuery ();
+
+			PartnerDAL.DeleteAllPartners (id);
 		}
 
 		public static int GetLastRowIndex () {

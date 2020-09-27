@@ -19,6 +19,7 @@ import { TaskData, UserInfo } from "../containers/Admin/TaskManager";
 import { Controller, useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import { taskState } from "../containers/state";
+import { Autocomplete } from "@material-ui/lab";
 
 interface Props {
   open: boolean;
@@ -45,10 +46,13 @@ const TaskForm = ({
 }: Props): JSX.Element => {
   const classes = useStyles();
   const setTaskState = useSetRecoilState(taskState);
-  const { register, handleSubmit, errors, control } = useForm<TaskData>();
+  const { register, handleSubmit, errors, control, setValue } = useForm<
+    TaskData
+  >();
   const [users, setUser] = useState<UserInfo[]>([]);
 
   useEffect(() => {
+    register({ name: "partners" });
     (async () => {
       const { data } = await Axios.get("/api/user");
       setUser(data);
@@ -158,6 +162,15 @@ const TaskForm = ({
             inputRef={register({ required: true })}
             error={!!errors.endDate}
             helperText="Required"
+          />
+          <Autocomplete
+            multiple
+            options={users}
+            getOptionLabel={(option: UserInfo) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Partners" placeholder="Favorites" />
+            )}
+            onChange={(_, values) => setValue("partners", values)}
           />
         </DialogContent>
         <DialogActions>
