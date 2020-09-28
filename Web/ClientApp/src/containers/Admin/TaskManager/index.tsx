@@ -28,6 +28,7 @@ interface TaskData {
   startDate: string;
   endDate: string;
   isPrivate: boolean;
+  images: number;
 }
 
 const url = "/api/task";

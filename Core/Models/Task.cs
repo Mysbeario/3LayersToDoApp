@@ -16,6 +16,7 @@ namespace Core.Models {
 		public TaskStatus Status { get; set; }
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
+		public int Images { get; set; }
 		public bool IsPrivate { get; set; }
 	}
 }

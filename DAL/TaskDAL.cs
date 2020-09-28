@@ -26,6 +26,7 @@ namespace DAL {
 					t.StartDate = DateTime.Parse (reader.GetString (5));
 					t.EndDate = DateTime.Parse (reader.GetString (6));
 					t.IsPrivate = reader.GetBoolean (7);
+					t.Images = reader.GetInt32 (8);
 					t.Partners = PartnerDAL.GetAllPartners (t);
 					data.Add (t);
 				}
@@ -56,6 +57,7 @@ namespace DAL {
 				t.StartDate = DateTime.Parse (reader["StartDate"].ToString ());
 				t.EndDate = DateTime.Parse (reader["EndDate"].ToString ());
 				t.IsPrivate = Boolean.Parse (reader["IsPrivate"].ToString () == "1" ? "true" : "false");
+				t.Images = Int32.Parse (reader["Images"].ToString ());
 				t.Partners = PartnerDAL.GetAllPartners (t);
 			}
 
@@ -65,8 +67,8 @@ namespace DAL {
 		public static void AddTask (Task t) {
 			DAL.ConnectDb ();
 
-			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, StartDate, EndDate, IsPrivate) " +
-				"VALUES (@OwnerId, @Title, @Description, @Status, @StartDate, @EndDate, @IsPrivate)";
+			string query = "INSERT INTO " + TableName + " (OwnerId, Title, Description, Status, StartDate, EndDate, IsPrivate, Images) " +
+				"VALUES (@OwnerId, @Title, @Description, @Status, @StartDate, @EndDate, @IsPrivate, @Images)";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
 			command.Parameters.AddWithValue ("@OwnerId", t.Owner.Id);
@@ -76,6 +78,7 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
 			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
 			command.Parameters.AddWithValue ("@IsPrivate", t.IsPrivate);
+			command.Parameters.AddWithValue ("@Images", t.Images);
 			command.ExecuteNonQuery ();
 
 			t.Id = GetLastRowIndex ();
@@ -89,7 +92,7 @@ namespace DAL {
 			DAL.ConnectDb ();
 
 			string query = "UPDATE " + TableName + " SET " +
-				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, StartDate = @StartDate, EndDate = @EndDate, IsPrivate = @IsPrivate " +
+				"OwnerId = @OwnerId, Title = @Title, Description = @Description, Status = @Status, StartDate = @StartDate, EndDate = @EndDate, IsPrivate = @IsPrivate, Images = @Images " +
 				"WHERE Id = @TaskId";
 			SQLiteCommand command = new SQLiteCommand (query, DAL.Conn);
 
@@ -101,6 +104,7 @@ namespace DAL {
 			command.Parameters.AddWithValue ("@StartDate", t.StartDate.ToString ());
 			command.Parameters.AddWithValue ("@EndDate", t.EndDate.ToString ());
 			command.Parameters.AddWithValue ("@IsPrivate", t.IsPrivate);
+			command.Parameters.AddWithValue ("@Images", t.Images);
 			command.ExecuteNonQuery ();
 
 			PartnerDAL.UpdatePartners (t);

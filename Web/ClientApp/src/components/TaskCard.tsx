@@ -3,6 +3,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CardMedia,
   Chip,
   Collapse,
   createStyles,
@@ -24,9 +25,10 @@ import {
 import clsx from "clsx";
 import PartnerShowcase from "./PartnerShowcase";
 import ShowComment from "./ShowComment";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { accountState, taskState } from "../containers/state";
 import Axios from "axios";
+import TaskMediaCarousel from "./TaskMediaCarousel";
 
 interface Props {
   data: TaskData;
@@ -128,6 +130,7 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
           {new Date(data.endDate).toDateString()}
         </em>
         {!!data.partners.length && <PartnerShowcase data={data.partners} />}
+        <TaskMediaCarousel id={data.id} images={data.images} />
       </CardContent>
       <CardActions disableSpacing>
         {data.status === 0 && (

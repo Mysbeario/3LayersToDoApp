@@ -22,6 +22,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import { taskState } from "../containers/state";
 import { Autocomplete } from "@material-ui/lab";
+import { DropzoneArea } from "material-ui-dropzone";
 
 interface Props {
   open: boolean;
@@ -52,6 +53,7 @@ const TaskForm = ({
     TaskData
   >();
   const [users, setUser] = useState<UserInfo[]>([]);
+  const [images, setImages] = useState<File[]>([]);
 
   useEffect(() => {
     register({ name: "partners" });
@@ -63,6 +65,18 @@ const TaskForm = ({
   }, []);
 
   useEffect(() => {
+    (async () => {
+      const images = editData?.images || 0;
+      const files: File[] = [];
+
+      for (let i = 0; i < images; i++) {
+        const { data } = await Axios.get(`/api/image/${editData?.id}_${i}`);
+        files.push(data);
+      }
+
+      setImages(files);
+    })();
+
     setValue("partners", editData?.partners);
   }, [editData]);
 
@@ -77,7 +91,7 @@ const TaskForm = ({
     };
 
     if (action === "create") {
-      const { data: lastId } = await Axios.post(url, postedData);
+      const { data: lastId } = await Axios.post(url, { ...postedData, images });
       const { data: newData } = await Axios.get(`${url}/${lastId}`);
       setTaskState((cur) => [...cur, newData]);
     } else {
@@ -174,6 +188,10 @@ const TaskForm = ({
             inputRef={register({ required: true })}
             error={!!errors.endDate}
             helperText="Required"
+          />
+          <DropzoneArea
+            initialFiles={images}
+            onChange={(files) => setImages(files)}
           />
           <Autocomplete
             multiple

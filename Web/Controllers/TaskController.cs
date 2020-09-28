@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BLL;
 using Core.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers {
@@ -12,6 +14,24 @@ namespace Web.Controllers {
 
 		public TaskController () {
 			this.service = new TaskBLL ();
+		}
+
+		private void UploadImage (Task task, IFormFile[] files) {
+			task.Images = files.Length;
+
+			for (int i = 0; i < files.Length; i++) {
+				byte[] image;
+				string path = $"../DAL/Images/{task.Id}_{i}";
+
+				using (var memoryStream = new MemoryStream ()) {
+					files[i].CopyTo (memoryStream);
+					image = memoryStream.ToArray ();
+				}
+
+				using (FileStream fs = System.IO.File.Create (path)) {
+					fs.Write (image, 0, image.Length);
+				}
+			}
 		}
 
 		[HttpGet]
@@ -32,12 +52,14 @@ namespace Web.Controllers {
 		}
 
 		[HttpPost]
-		public int AddNewTask (Task task) {
+		public int AddTask (Task task, IFormFile[] files) {
+			this.UploadImage (task, files);
 			return this.service.AddTask (task);
 		}
 
 		[HttpPut]
-		public void UpdateTask (Task task) {
+		public void UpdateTask (Task task, IFormFile[] files) {
+			this.UploadImage (task, files);
 			this.service.UpdateTask (task);
 		}
 
