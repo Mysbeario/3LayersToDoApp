@@ -23,6 +23,7 @@ import {
 } from "@material-ui/icons";
 import clsx from "clsx";
 import PartnerShowcase from "./PartnerShowcase";
+import ShowComment from "./ShowComment";
 
 interface Props {
   data: TaskData;
@@ -57,6 +58,7 @@ const useStyles = makeStyles((theme) =>
 const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
   const classes = useStyles();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showComment, setShowComment] = useState(false);
 
   return (
     <Card className={classes.card}>
@@ -112,7 +114,7 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
             <EditIcon />
           </IconButton>
         )}
-        <IconButton>
+        <IconButton onClick={() => setShowComment(true)}>
           <CommentIcon />
         </IconButton>
         <IconButton
@@ -128,6 +130,11 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
         <Divider />
         <CardContent>{data.description}</CardContent>
       </Collapse>
+      <ShowComment
+        open={showComment}
+        onClose={() => setShowComment(false)}
+        task={data}
+      />
     </Card>
   );
 };

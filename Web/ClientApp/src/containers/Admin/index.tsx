@@ -24,6 +24,7 @@ const useStyles = makeStyles(() =>
 
 const UserManager = lazy(() => import("./UserManager"));
 const TaskManager = lazy(() => import("./TaskManager"));
+const CommentManager = lazy(() => import("./CommentManager"));
 
 const Admin = (): JSX.Element => {
   const classes = useStyles();
@@ -58,6 +59,9 @@ const Admin = (): JSX.Element => {
             </Route>
             <Route exact path={`${path}/task`}>
               <TaskManager />
+            </Route>
+            <Route exact path={`${path}/comment`}>
+              <CommentManager />
             </Route>
           </Switch>
         </Grid>

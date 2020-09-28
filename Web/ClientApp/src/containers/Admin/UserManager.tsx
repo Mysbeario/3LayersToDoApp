@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import MaterialTable from "material-table";
-import PasswordHider from "../../../components/PasswordHider";
-import TableIcons from "../../../components/TableIcons";
+import PasswordHider from "../../components/PasswordHider";
+import TableIcons from "../../components/TableIcons";
 import { MenuItem, Select } from "@material-ui/core";
 
 interface UserData {

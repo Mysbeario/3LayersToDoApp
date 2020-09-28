@@ -9,7 +9,11 @@ import {
   ListSubheader,
   makeStyles,
 } from "@material-ui/core";
-import { Face as FaceIcon, ListAlt as ListAltIcon } from "@material-ui/icons";
+import {
+  Face as FaceIcon,
+  ListAlt as ListAltIcon,
+  Comment as CommentIcon,
+} from "@material-ui/icons";
 import { Link, useRouteMatch } from "react-router-dom";
 
 const useStyles = makeStyles((theme) =>
@@ -45,6 +49,14 @@ const CategoryMenu = (): JSX.Element => {
               <ListAltIcon />
             </ListItemIcon>
             <ListItemText primary="Tasks" />
+          </ListItem>
+        </Link>
+        <Link to={`${url}/comment`}>
+          <ListItem button>
+            <ListItemIcon>
+              <CommentIcon />
+            </ListItemIcon>
+            <ListItemText primary="Comments" />
           </ListItem>
         </Link>
       </List>
