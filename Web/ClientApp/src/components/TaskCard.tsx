@@ -24,6 +24,9 @@ import {
 import clsx from "clsx";
 import PartnerShowcase from "./PartnerShowcase";
 import ShowComment from "./ShowComment";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { accountState, taskState } from "../containers/state";
+import Axios from "axios";
 
 interface Props {
   data: TaskData;
@@ -59,6 +62,21 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
   const classes = useStyles();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showComment, setShowComment] = useState(false);
+  const account = useRecoilValue(accountState);
+  const setTaskState = useSetRecoilState(taskState);
+
+  const changeStatus = async () => {
+    const status = data.status === 0 ? 1 : 0;
+    const newData: TaskData = { ...data, status };
+    await Axios.put("/api/task", newData);
+    setTaskState((cur) => {
+      const updatedData = [...cur];
+      updatedData[
+        cur.indexOf(cur.find((d) => d.id === data.id) as TaskData)
+      ] = newData;
+      return updatedData;
+    });
+  };
 
   return (
     <Card className={classes.card}>
@@ -90,7 +108,10 @@ const TaskCard = ({ data, onEditClick }: Props): JSX.Element => {
           </Typography>
         }
         action={
-          <IconButton>
+          <IconButton
+            disabled={data.status === 2 || data.owner.id !== account.id}
+            onClick={changeStatus}
+          >
             {data.status === 1 ? (
               <DoneIcon style={{ color: "green" }} />
             ) : data.status === 0 ? (

@@ -69,6 +69,7 @@ const UserPage = (): JSX.Element => {
     });
     setOpenForm(true);
   };
+
   useEffect(() => {
     (async () => {
       const { data } = await Axios.get("/api/task");
